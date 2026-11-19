@@ -1,0 +1,463 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分散式任務調度與工作流編排平台架構圖</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #e9eef5;
+    font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+  }
+  .toolbar {
+    max-width: 1600px;
+    margin: 0 auto 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    color: #26354b;
+    font-size: 14px;
+  }
+  button {
+    border: 0;
+    border-radius: 7px;
+    background: #173d72;
+    color: white;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: #245795; }
+  .canvas {
+    max-width: 1600px;
+    margin: auto;
+    background: #f7f9fc;
+    box-shadow: 0 12px 40px #172d4a22;
+  }
+  svg { display: block; width: 100%; height: auto; }
+  @media print {
+    @page { size: 16in 9in; margin: 0; }
+    body { padding: 0; background: white; }
+    .toolbar { display: none; }
+    .canvas { max-width: none; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>分散式任務調度與工作流編排平台｜架構總覽</span>
+  <button onclick="window.print()">列印 / 另存 PDF</button>
+</div>
+
+<div class="canvas">
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1600 900"
+     role="img"
+     aria-label="分散式任務調度與工作流編排平台架構圖">
+
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#f8fbff"/>
+    <stop offset="100%" stop-color="#edf3fa"/>
+  </linearGradient>
+  <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#122c50"/>
+    <stop offset="100%" stop-color="#20548a"/>
+  </linearGradient>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#eaf3ff"/>
+    <stop offset="100%" stop-color="#d9e9ff"/>
+  </linearGradient>
+  <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#f4efff"/>
+    <stop offset="100%" stop-color="#e7ddff"/>
+  </linearGradient>
+  <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#e8f8f0"/>
+    <stop offset="100%" stop-color="#d4f0e2"/>
+  </linearGradient>
+  <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#fff5e8"/>
+    <stop offset="100%" stop-color="#ffe8c9"/>
+  </linearGradient>
+
+  <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+    <feDropShadow dx="0" dy="3" stdDeviation="5"
+                  flood-color="#233c5a" flood-opacity=".10"/>
+  </filter>
+
+  <marker id="arrowBlue" markerWidth="9" markerHeight="9"
+          refX="7" refY="4.5" orient="auto">
+    <path d="M0,0 L9,4.5 L0,9 Z" fill="#3976bb"/>
+  </marker>
+  <marker id="arrowPurple" markerWidth="9" markerHeight="9"
+          refX="7" refY="4.5" orient="auto">
+    <path d="M0,0 L9,4.5 L0,9 Z" fill="#8660c9"/>
+  </marker>
+  <marker id="arrowGreen" markerWidth="9" markerHeight="9"
+          refX="7" refY="4.5" orient="auto">
+    <path d="M0,0 L9,4.5 L0,9 Z" fill="#27966b"/>
+  </marker>
+  <marker id="arrowOrange" markerWidth="9" markerHeight="9"
+          refX="7" refY="4.5" orient="auto">
+    <path d="M0,0 L9,4.5 L0,9 Z" fill="#d68a35"/>
+  </marker>
+  <marker id="arrowGray" markerWidth="9" markerHeight="9"
+          refX="7" refY="4.5" orient="auto">
+    <path d="M0,0 L9,4.5 L0,9 Z" fill="#73849a"/>
+  </marker>
+
+  <style>
+    .main-title { font-size: 29px; font-weight: 700; fill: #fff; }
+    .subtitle { font-size: 13px; fill: #c8dcf4; letter-spacing: 1px; }
+    .section-title { font-size: 17px; font-weight: 700; fill: #243d5c; }
+    .section-en { font-size: 10px; fill: #71849c; letter-spacing: 1.2px; }
+    .node-title { font-size: 16px; font-weight: 700; fill: #213a59; }
+    .node-sub { font-size: 12px; fill: #536b86; }
+    .small { font-size: 11px; fill: #61758e; }
+    .tiny { font-size: 10px; fill: #6b7e95; }
+    .white-title { font-size: 15px; font-weight: 700; fill: #fff; }
+    .white-sub { font-size: 11px; fill: #d9e7f8; }
+    .arrow-label { font-size: 11px; font-weight: 600; fill: #536c89; }
+    .line-blue {
+      stroke: #3976bb; stroke-width: 2.2; fill: none;
+      marker-end: url(#arrowBlue);
+    }
+    .line-purple {
+      stroke: #8660c9; stroke-width: 2.2; fill: none;
+      marker-end: url(#arrowPurple);
+    }
+    .line-green {
+      stroke: #27966b; stroke-width: 2.2; fill: none;
+      marker-end: url(#arrowGreen);
+    }
+    .line-orange {
+      stroke: #d68a35; stroke-width: 2.2; fill: none;
+      marker-end: url(#arrowOrange);
+    }
+    .line-gray {
+      stroke: #73849a; stroke-width: 1.8; fill: none;
+      marker-end: url(#arrowGray);
+    }
+    .dashed { stroke-dasharray: 6 5; }
+  </style>
+</defs>
+
+<!-- 背景 -->
+<rect width="1600" height="900" fill="url(#bg)"/>
+
+<!-- 頂部標題 -->
+<rect width="1600" height="100" fill="url(#header)"/>
+<rect x="0" y="96" width="1600" height="4" fill="#54b8db"/>
+<text x="48" y="44" class="main-title">
+  分散式任務調度與工作流編排平台
+</text>
+<text x="50" y="72" class="subtitle">
+  DISTRIBUTED SCHEDULING &amp; WORKFLOW ORCHESTRATION
+</text>
+<rect x="1303" y="27" width="245" height="43" rx="21"
+      fill="#ffffff" fill-opacity=".12" stroke="#9ac8ed" stroke-opacity=".55"/>
+<text x="1425" y="44" text-anchor="middle" font-size="11"
+      fill="#d7eaff">CENTRAL DISPATCH MODEL</text>
+<text x="1425" y="60" text-anchor="middle" font-size="10"
+      fill="#ffffff">中央分派 · 狀態同步 · 水平擴展</text>
+
+<!-- 分區底板 -->
+<rect x="28" y="119" width="1544" height="172" rx="15"
+      fill="#eaf2fc" stroke="#d3e1f2"/>
+<rect x="28" y="304" width="1544" height="174" rx="15"
+      fill="#f0edfb" stroke="#ded6f3"/>
+<rect x="28" y="491" width="1544" height="150" rx="15"
+      fill="#eaf7f0" stroke="#cfe9dc"/>
+<rect x="28" y="654" width="1544" height="170" rx="15"
+      fill="#f2f5f9" stroke="#dce4ee"/>
+
+<!-- 分區標籤 -->
+<text x="48" y="145" class="section-title">01  調度與執行層</text>
+<text x="48" y="162" class="section-en">SCHEDULING &amp; EXECUTION</text>
+<text x="48" y="330" class="section-title">02  Redis 中介與訊息層</text>
+<text x="48" y="347" class="section-en">CACHE, QUEUE &amp; STREAM</text>
+<text x="48" y="517" class="section-title">03  Agent 能力執行層</text>
+<text x="48" y="534" class="section-en">TECHNICAL WORKERS</text>
+<text x="48" y="680" class="section-title">04  資料持久化與同步層</text>
+<text x="48" y="697" class="section-en">PERSISTENCE &amp; LOG INGESTION</text>
+
+<!-- 調度層：中央分派器 -->
+<g filter="url(#shadow)">
+  <rect x="62" y="174" width="340" height="99" rx="12"
+        fill="url(#blue)" stroke="#8bb5e9" stroke-width="1.4"/>
+  <rect x="62" y="174" width="7" height="99" rx="3" fill="#3976bb"/>
+</g>
+<circle cx="91" cy="200" r="12" fill="#3976bb"/>
+<path d="M85 200h12 M91 194v12" stroke="#fff" stroke-width="2"
+      stroke-linecap="round"/>
+<text x="112" y="204" class="node-title">中央分派器</text>
+<rect x="282" y="187" width="97" height="23" rx="11"
+      fill="#3976bb"/>
+<text x="330" y="202" text-anchor="middle" font-size="11"
+      font-weight="700" fill="#fff">主備架構</text>
+<text x="83" y="231" class="node-sub">任務掃描與集中分派</text>
+<text x="83" y="249" class="node-sub">訂閱者 / Agent 狀態探測</text>
+<text x="83" y="266" class="node-sub">超時回收 · 工作流節點快取</text>
+
+<!-- 消費訂閱者 -->
+<g filter="url(#shadow)">
+  <rect x="476" y="174" width="340" height="99" rx="12"
+        fill="url(#purple)" stroke="#b9a1eb" stroke-width="1.4"/>
+  <rect x="476" y="174" width="7" height="99" rx="3" fill="#8660c9"/>
+</g>
+<circle cx="505" cy="200" r="12" fill="#8660c9"/>
+<path d="M499 197h12 M499 203h12" stroke="#fff" stroke-width="2"
+      stroke-linecap="round"/>
+<text x="526" y="204" class="node-title">消費訂閱者</text>
+<rect x="700" y="187" width="96" height="23" rx="11"
+      fill="#8660c9"/>
+<text x="748" y="202" text-anchor="middle" font-size="11"
+      font-weight="700" fill="#fff">集群部署</text>
+<text x="497" y="231" class="node-sub">專屬任務取得與認領</text>
+<text x="497" y="249" class="node-sub">協程並發 · 工作流節點執行</text>
+<text x="497" y="266" class="node-sub">逐步回報狀態 · 故障恢復</text>
+
+<!-- 狀態同步器 -->
+<g filter="url(#shadow)">
+  <rect x="890" y="174" width="290" height="99" rx="12"
+        fill="#fff" stroke="#a7b8ca" stroke-width="1.4"/>
+  <rect x="890" y="174" width="7" height="99" rx="3" fill="#527797"/>
+</g>
+<circle cx="919" cy="200" r="12" fill="#527797"/>
+<path d="M913 200a6 6 0 0 1 10-4 M925 196v-4 M925 196h-4
+         M925 200a6 6 0 0 1-10 4 M913 204v4 M913 204h4"
+      stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+<text x="940" y="204" class="node-title">狀態同步器</text>
+<rect x="1081" y="187" width="82" height="23" rx="11"
+      fill="#527797"/>
+<text x="1122" y="202" text-anchor="middle" font-size="11"
+      font-weight="700" fill="#fff">主備架構</text>
+<text x="911" y="234" class="node-sub">消費 Redis Stream 狀態訊息</text>
+<text x="911" y="253" class="node-sub">任務進度與結果同步至 SQL Server</text>
+
+<!-- 日誌同步器 -->
+<g filter="url(#shadow)">
+  <rect x="1254" y="174" width="292" height="99" rx="12"
+        fill="url(#orange)" stroke="#e9bd85" stroke-width="1.4"/>
+  <rect x="1254" y="174" width="7" height="99" rx="3" fill="#d68a35"/>
+</g>
+<circle cx="1283" cy="200" r="12" fill="#d68a35"/>
+<path d="M1278 194h9v12h-9z M1280 198h5 M1280 202h5"
+      stroke="#fff" stroke-width="1.4" fill="none"/>
+<text x="1304" y="204" class="node-title">日誌同步器</text>
+<text x="1275" y="234" class="node-sub">增量讀取 Agent JSONL 日誌</text>
+<text x="1275" y="253" class="node-sub">批次壓縮 · 日誌資料入庫</text>
+
+<!-- 主備 / 集群輔助標示 -->
+<text x="232" y="286" text-anchor="middle" class="tiny">
+  Active / Standby
+</text>
+<text x="646" y="286" text-anchor="middle" class="tiny">
+  Horizontal Scaling
+</text>
+<text x="1035" y="286" text-anchor="middle" class="tiny">
+  Active / Standby
+</text>
+
+<!-- Redis 中介層三個元件 -->
+<g filter="url(#shadow)">
+  <rect x="62" y="359" width="350" height="91" rx="11"
+        fill="#fff" stroke="#8bb5e9" stroke-width="1.3"/>
+  <rect x="435" y="359" width="350" height="91" rx="11"
+        fill="#fff" stroke="#b9a1eb" stroke-width="1.3"/>
+  <rect x="808" y="359" width="350" height="91" rx="11"
+        fill="#fff" stroke="#8dbda8" stroke-width="1.3"/>
+  <rect x="1181" y="359" width="365" height="91" rx="11"
+        fill="#fff" stroke="#a7b8ca" stroke-width="1.3"/>
+</g>
+
+<!-- Cache -->
+<rect x="62" y="359" width="350" height="7" rx="3" fill="#3976bb"/>
+<text x="84" y="390" class="node-title">Redis Cache</text>
+<text x="84" y="412" class="node-sub">訂閱者 / Agent 運行狀態</text>
+<text x="84" y="431" class="node-sub">PIP NAME 與工作流節點快取</text>
+
+<!-- List -->
+<rect x="435" y="359" width="350" height="7" rx="3" fill="#8660c9"/>
+<text x="457" y="390" class="node-title">Redis List</text>
+<text x="457" y="412" class="node-sub">中央分派器 → 專屬任務佇列</text>
+<text x="457" y="431" class="node-sub">訂閱者依自身識別資訊取得任務</text>
+
+<!-- Stream -->
+<rect x="808" y="359" width="350" height="7" rx="3" fill="#27966b"/>
+<text x="830" y="390" class="node-title">Redis Stream</text>
+<text x="830" y="412" class="node-sub">逐步任務狀態與執行進度訊息</text>
+<text x="830" y="431" class="node-sub">確認機制與副本同步可靠性要求</text>
+
+<!-- Redis HA -->
+<rect x="1181" y="359" width="365" height="7" rx="3" fill="#527797"/>
+<text x="1203" y="390" class="node-title">Redis 高可用機制</text>
+<text x="1203" y="412" class="node-sub">持久化 · Sentinel 主從故障切換</text>
+<text x="1203" y="431" class="node-sub">保障任務佇列與狀態訊息可靠性</text>
+
+<!-- 調度層與 Redis 的連線 -->
+<path d="M232 273 V319 H610 V351" class="line-blue"/>
+<rect x="314" y="305" width="214" height="22" rx="11" fill="#eaf2fc"/>
+<text x="421" y="320" text-anchor="middle" class="arrow-label">
+  分配任務 / 更新快取
+</text>
+
+<path d="M646 273 V336 H610 V351" class="line-purple"/>
+<rect x="654" y="310" width="126" height="21" rx="10" fill="#f0edfb"/>
+<text x="717" y="324" text-anchor="middle" class="arrow-label">
+  取得專屬任務
+</text>
+
+<!-- Redis Stream 到狀態同步器 -->
+<path d="M983 359 V324 H1035 V281" class="line-green"/>
+<rect x="1001" y="300" width="143" height="20" rx="10" fill="#eaf7f0"/>
+<text x="1072" y="314" text-anchor="middle" class="arrow-label">
+  狀態訊息消費
+</text>
+
+<!-- Cache 到訂閱者 -->
+<path d="M237 359 V342 H530 V281" class="line-blue"/>
+<rect x="296" y="334" width="155" height="20" rx="10" fill="#eaf2fc"/>
+<text x="373" y="348" text-anchor="middle" class="arrow-label">
+  狀態 / 節點快取
+</text>
+
+<!-- Redis 高可用虛線關聯 -->
+<path d="M1158 404 H1181" class="line-gray dashed"/>
+<text x="1169" y="393" text-anchor="middle" class="tiny">HA</text>
+
+<!-- Agent 執行層 -->
+<g filter="url(#shadow)">
+  <rect x="62" y="546" width="1484" height="73" rx="12"
+        fill="url(#green)" stroke="#8fc8ac" stroke-width="1.4"/>
+</g>
+<rect x="62" y="546" width="8" height="73" rx="3" fill="#27966b"/>
+<text x="88" y="572" class="node-title">Agent 基層工作者</text>
+<text x="88" y="594" class="node-sub">無狀態 · 標準 RESTful API · 單一技術職責</text>
+
+<!-- Agent 技術能力標籤 -->
+<g font-size="12" font-weight="600" text-anchor="middle">
+  <rect x="420" y="558" width="132" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="486" y="577" fill="#277650">DB Agent</text>
+  <rect x="564" y="558" width="132" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="630" y="577" fill="#277650">SFTP Agent</text>
+  <rect x="708" y="558" width="132" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="774" y="577" fill="#277650">RFC Agent</text>
+  <rect x="852" y="558" width="132" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="918" y="577" fill="#277650">Gateway Agent</text>
+  <rect x="996" y="558" width="150" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="1071" y="577" fill="#277650">Transform Agent</text>
+  <rect x="1158" y="558" width="132" height="29" rx="14" fill="#fff" stroke="#a8d5bd"/>
+  <text x="1224" y="577" fill="#277650">Email Agent</text>
+</g>
+<text x="420" y="605" class="small">
+  本地並發限流 · 健康檢查 · 標準化請求 / 回應 · JSONL 結構化日誌
+</text>
+
+<!-- 訂閱者呼叫 Agent -->
+<path d="M646 273 V296 H1530 V532 H1010 V546" class="line-green"/>
+<rect x="1130" y="285" width="210" height="22" rx="11" fill="#eaf7f0"/>
+<text x="1235" y="300" text-anchor="middle" class="arrow-label">
+  HTTP 呼叫 / 回傳執行結果
+</text>
+
+<!-- Agent 狀態回報 -->
+<path d="M420 559 H395 V535 H250 V281" class="line-blue dashed"/>
+<rect x="271" y="514" width="120" height="20" rx="10" fill="#eaf2fc"/>
+<text x="331" y="528" text-anchor="middle" class="arrow-label">
+  健康狀態探測
+</text>
+
+<!-- 資料層：SQL Server -->
+<g filter="url(#shadow)">
+  <rect x="62" y="710" width="680" height="91" rx="12"
+        fill="#fff" stroke="#8bb5e9" stroke-width="1.4"/>
+  <rect x="62" y="710" width="8" height="91" rx="3" fill="#3976bb"/>
+</g>
+<g transform="translate(88 730)" fill="none" stroke="#3976bb" stroke-width="2">
+  <ellipse cx="16" cy="6" rx="16" ry="6"/>
+  <path d="M0 6v30c0 8 32 8 32 0V6"/>
+  <path d="M0 16c0 8 32 8 32 0 M0 26c0 8 32 8 32 0"/>
+</g>
+<text x="137" y="738" class="node-title">SQL Server｜核心調度資料庫</text>
+<text x="137" y="759" class="node-sub">任務與執行狀態 · 排程定義 · 工作流節點</text>
+<text x="137" y="779" class="node-sub">訂閱者 / Agent 註冊資訊 · 執行摘要 · 調度元資料</text>
+
+<!-- FileDB -->
+<g filter="url(#shadow)">
+  <rect x="772" y="710" width="386" height="91" rx="12"
+        fill="#fff" stroke="#e9bd85" stroke-width="1.4"/>
+  <rect x="772" y="710" width="8" height="91" rx="3" fill="#d68a35"/>
+</g>
+<g transform="translate(797 730)" fill="none" stroke="#d68a35" stroke-width="2">
+  <path d="M0 0h25l10 10v32H0z"/>
+  <path d="M25 0v10h10 M7 20h21 M7 27h21 M7 34h15"/>
+</g>
+<text x="850" y="738" class="node-title">FileDB｜業務資料與日誌</text>
+<text x="850" y="759" class="node-sub">WORKFLOW_BLOB_STORAGE</text>
+<text x="850" y="779" class="node-sub">BUSINESS_FILE · AGENT_INTERACTION_LOG</text>
+
+<!-- 日誌同步器到 FileDB -->
+<path d="M1399 273 V293 H1515 V693 H1060 V702" class="line-orange"/>
+<rect x="1327" y="663" width="190" height="22" rx="11" fill="#fff5e8"/>
+<text x="1422" y="678" text-anchor="middle" class="arrow-label">
+  批次壓縮寫入日誌
+</text>
+
+<!-- 狀態同步器到 SQL -->
+<path d="M1035 273 V298 H752 V696 H580 V702" class="line-blue"/>
+<rect x="767" y="663" width="207" height="22" rx="11" fill="#eaf2fc"/>
+<text x="870" y="678" text-anchor="middle" class="arrow-label">
+  狀態 / 進度持久化
+</text>
+
+<!-- 中央分派器讀寫 SQL -->
+<path d="M100 710 V688 H42 V164 H62" class="line-blue dashed"/>
+<rect x="45" y="440" width="20" height="150" rx="10" fill="#f7f9fc"/>
+<text x="59" y="515" transform="rotate(-90 59 515)"
+      text-anchor="middle" class="tiny">任務掃描 / 狀態更新</text>
+
+<!-- 訂閱者可能讀取節點配置 / 任務資料 -->
+<path d="M650 710 V687 H720 V281" class="line-gray dashed"/>
+<rect x="667" y="665" width="134" height="20" rx="10" fill="#f2f5f9"/>
+<text x="734" y="679" text-anchor="middle" class="arrow-label">
+  必要資料讀取
+</text>
+
+<!-- 圖例 -->
+<rect x="62" y="836" width="1476" height="42" rx="9"
+      fill="#fff" stroke="#dce4ee"/>
+<text x="82" y="862" font-size="12" font-weight="700" fill="#344c68">
+  資料流圖例
+</text>
+
+<path d="M195 857 H239" class="line-blue"/>
+<text x="250" y="862" class="small">任務 / 資料存取</text>
+
+<path d="M405 857 H449" class="line-purple"/>
+<text x="460" y="862" class="small">任務佇列</text>
+
+<path d="M566 857 H610" class="line-green"/>
+<text x="621" y="862" class="small">工作流執行</text>
+
+<path d="M741 857 H785" class="line-orange"/>
+<text x="796" y="862" class="small">日誌搬運</text>
+
+<path d="M910 857 H954" class="line-gray dashed"/>
+<text x="965" y="862" class="small">輔助 / 配置資料流</text>
+
+<text x="1516" y="862" text-anchor="end" class="tiny">
+  Go Microservices · SQL Server · Redis Sentinel
+</text>
+</svg>
+</div>
+
+</body>
+</html>
